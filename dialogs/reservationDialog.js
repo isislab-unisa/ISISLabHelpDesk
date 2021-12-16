@@ -33,7 +33,7 @@ const ATTACHMENT_PROMPT = 'ATTACHMENT_PROMPT';
 const BING_SEARCH_API_KEY = process.env.BingSearchAPI;
 // Update these values with the ones taken from Azure Storage Account
 const STORAGE_ACCOUNT_NAME = process.env.StorageAccountName;
-const SA_CONNECTION_STRING = process.env.SAConnectionString;
+const ACCOUNT_SAS = process.env.AccountSAS;
 // Update this value with the ones taken from Azure FunctionApp
 const FUNCTION_ENDPOINT = process.env.FunctionEndpoint;
 
@@ -127,10 +127,20 @@ class ReservationDialog extends ComponentDialog {
         };
         if (step.values.choice === 'Si' || step.values.choice.toLowerCase().includes('s')) {
             var imageSent = step.result;
-
+          
+            // const pipeline = newPipeline(new AnonymousCredential(), {
+            //   retryOptions: { maxTries: 4 }, // Retry options
+            //   userAgentOptions: { userAgentPrefix: "AdvancedSample V1.0.0" }, // Customized telemetry string
+            //   keepAliveOptions: {
+            //     // Keep alive is enabled by default, disable keep alive by setting false
+            //     enable: false
+            //   }
+            // });
             // Create the BlobServiceClient object which will be used to create a container client
-            const connectionString = SA_CONNECTION_STRING;
-            const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+
+            const blobServiceClient = new BlobServiceClient(
+              `https://${STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${ACCOUNT_SAS}`
+            );
 
             // Get a reference to a container
             const containerName = 'public';
